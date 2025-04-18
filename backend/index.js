@@ -1,9 +1,10 @@
 import express from 'express';
 import cors from 'cors';
-import appRouter from './routes/user.route.js';
 import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import connectDB from './db/index.js';
+import appRouter from './routes/user.route.js';
+import plantRouter from './routes/plant.route.js';
 
 dotenv.config();
 
@@ -18,6 +19,7 @@ app.use(express.json());
 // Middleware to parse incoming requests with URL-encoded payloads
 app.use(cookieParser());
 app.use('/api/v1', appRouter);
+app.use('/api/v1', plantRouter);
 
 connectDB()
   .then(() => {
