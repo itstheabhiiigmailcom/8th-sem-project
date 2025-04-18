@@ -79,7 +79,7 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { email, password } = req.body;
-    console.log('email : ', email);
+    // console.log('email : ', email);
     const user = await User.findOne({ email });
     if (!user || !(await user.isPasswordCorrect(password))) {
       return res.status(401).json({ message: 'Invalid email or password' });
@@ -87,7 +87,6 @@ const login = async (req, res) => {
 
     // Generate tokens
     const accessToken = generateAccessToken(user._id);
-    console.log('Executed till here');
     const refreshToken = generateRefreshToken(user._id);
 
     // Save the refresh token in the database
@@ -117,10 +116,10 @@ const login = async (req, res) => {
 // Refreshing the access token with the help of refreshToken
 // even this refreshToken can also expires after fixed long term
 const refreshTheToken = async (req, res) => {
-  const { refreshTokenFromBody } = req.body;
+  // const { refreshTokenFromBody } = req.body;
   const refreshTokenFromCookie = req.cookies.refreshToken;
 
-  const refreshToken = refreshTokenFromBody || refreshTokenFromCookie;
+  const refreshToken = refreshTokenFromCookie;
   if (!refreshToken)
     return res.status(403).json({ message: 'Refresh token is required' });
 

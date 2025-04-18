@@ -1,18 +1,38 @@
-import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import AuthUI from './components/authentication/Auth-ui';
+import ProtectedRoute from './routes/ProtectedRoute';
+import NotFound from './pages/NotFound';
 import Home from './pages/Home';
 import Garden from './pages/Garden';
-import './App.css';
 
-function App() {
+export default function App() {
   return (
     <Router>
       <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/garden" element={<Garden />} />
+        {/* Public Route */}
+        <Route path="/" element={<AuthUI />} />
+
+        {/* Protected Routes */}
+        <Route
+          path="/home"
+          element={
+            <ProtectedRoute>
+              <Home />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/garden"
+          element={
+            <ProtectedRoute>
+              <Garden />
+            </ProtectedRoute>
+          }
+        />
+
+        {/* 404 */}
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
   );
 }
-
-export default App;
