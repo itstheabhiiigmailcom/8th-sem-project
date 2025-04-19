@@ -25,7 +25,7 @@ export default function LoginForm({ switchToSignup }) {
   const onSubmit = async (data) => {
     await login(data);
     if (!error) {
-      navigate('/dashboard');
+      navigate('/home');
     }
   };
 
@@ -62,19 +62,23 @@ export default function LoginForm({ switchToSignup }) {
 }
 
 // ✅ Fixed InputField with forwardRef
-const InputField = forwardRef(({ label, type = 'text', error, ...props }, ref) => {
-  return (
-    <div>
-      <label className="block text-sm font-medium text-gray-700">{label}</label>
-      <input
-        type={type}
-        ref={ref} // Added ref here
-        className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500"
-        {...props}
-      />
-      {error && <p className="mt-1 text-sm text-red-600">{error.message}</p>}
-    </div>
-  );
-});
+const InputField = forwardRef(
+  ({ label, type = 'text', error, ...props }, ref) => {
+    return (
+      <div>
+        <label className="block text-sm font-medium text-gray-700">
+          {label}
+        </label>
+        <input
+          type={type}
+          ref={ref} // Added ref here
+          className="mt-1 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:ring-1 focus:ring-blue-500"
+          {...props}
+        />
+        {error && <p className="mt-1 text-sm text-red-600">{error.message}</p>}
+      </div>
+    );
+  }
+);
 
 InputField.displayName = 'InputField'; // Required to avoid warning with forwardRef

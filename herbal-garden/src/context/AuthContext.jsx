@@ -12,6 +12,7 @@ export const AuthProvider = ({ children }) => {
     const loadUser = async () => {
       try {
         const user = await fetchAuthenticatedUser();
+        // console.log('user : ', user);
         setUser(user);
       } catch (err) {
         setUser(null);
@@ -28,6 +29,7 @@ export const AuthProvider = ({ children }) => {
     setError(null);
     try {
       const { user } = await loginUser(credentials);
+      // console.log('logged in user : ', user);
       setUser(user);
     } catch (err) {
       setError(err.message);
@@ -41,8 +43,9 @@ export const AuthProvider = ({ children }) => {
     setAuthLoading(true);
     setError(null);
     try {
-      const { user } = await registerUser(data);
-      setUser(user);
+      const { data } = await registerUser(data);
+      // console.log(user);
+      setUser(data);
     } catch (err) {
       setError(err.message);
       setUser(null);

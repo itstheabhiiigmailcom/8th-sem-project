@@ -4,6 +4,8 @@ import { useAuth } from '../context/AuthContext';
 export default function ProtectedRoute({ children }) {
   const { user, authLoading } = useAuth();
 
+  console.log('user aaya : ', user || 'No user found');
+
   if (authLoading) {
     // Show a loading spinner or just null until auth check finishes
     return <div>Loading...</div>;

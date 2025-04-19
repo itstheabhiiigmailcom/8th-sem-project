@@ -107,7 +107,7 @@ const login = async (req, res) => {
         sameSite: 'Lax',
         maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days in milliseconds
       })
-      .json({ accessToken, refreshToken });
+      .json({ user, accessToken, refreshToken });
   } catch (error) {
     res.status(500).json({ message: 'Login failed', error });
   }

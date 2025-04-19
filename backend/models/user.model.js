@@ -23,6 +23,19 @@ const userSchema = new mongoose.Schema({
     required: true,
     trim: true,
   },
+
+  visitedPlants: [
+    {
+      plant_id: {
+        type: String,
+        required: true,
+      },
+      visitCount: {
+        type: Number,
+        default: 1,
+      },
+    },
+  ],
   refreshToken: { type: String }, // Store the latest refresh token
 });
 
