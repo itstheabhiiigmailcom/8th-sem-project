@@ -1,6 +1,6 @@
-import AWS from "aws-sdk";
-import fs from "fs";
-import dotenv from "dotenv";
+import AWS from 'aws-sdk';
+import fs from 'fs';
+import dotenv from 'dotenv';
 
 dotenv.config();
 
@@ -23,37 +23,37 @@ export const uploadToS3 = async ({ filePath, fileName, mimetype }) => {
 
     // S3 upload parameters
     const params = {
-      Bucket: process.env.AWS_BUCKET_NAME, // bucket name
-      Key: `garbage_pdfs/${fileName}`, // S3 key (path inside the bucket)
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: `garbage_pdfs/${fileName}`,
       Body: fileStream,
-      ContentType: mimetype, // MIME type
+      ContentType: mimetype,
     };
 
     // Upload to S3
     const uploadResult = await s3.upload(params).promise();
-    fs.unlinkSync(filePath);      // delete it from disk
+    fs.unlinkSync(filePath); // Delete local file
     return uploadResult;
   } catch (err) {
-    fs.unlinkSync(localFilePath)
-    console.error("Error uploading to S3:", err.message);
+    fs.unlinkSync(filePath); // ✅ Corrected here
+    console.error('Error uploading to S3:', err.message);
     throw err;
   }
 };
 
-export const deleteFileFromS3 = async (fileUrl) => {
-  try {
-    // Extract the file name from the S3 URL
-    const fileName = fileUrl.split("/").slice(-2).join("/"); 
-    // Set up the parameters for the delete operation
-    const params = {
-      Bucket: process.env.AWS_BUCKET_NAME, // Your S3 bucket name
-      Key: fileName, // The file name (or path) in the bucket
-    };
+// export const deleteFileFromS3 = async (fileUrl) => {
+//   try {
+//     // Extract the file name from the S3 URL
+//     const fileName = fileUrl.split('/').slice(-2).join('/');
+//     // Set up the parameters for the delete operation
+//     const params = {
+//       Bucket: process.env.AWS_BUCKET_NAME, // Your S3 bucket name
+//       Key: fileName, // The file name (or path) in the bucket
+//     };
 
-    // Delete the file from S3
-    const response = await s3.deleteObject(params).promise();
-    console.log("Old File deleted from S3:", fileName);
-  } catch (err) {
-    console.error("Error deleting file from S3:", err.message);
-  }
-};
+//     // Delete the file from S3
+//     const response = await s3.deleteObject(params).promise();
+//     console.log('Old File deleted from S3:', fileName);
+//   } catch (err) {
+//     console.error('Error deleting file from S3:', err.message);
+//   }
+// };
