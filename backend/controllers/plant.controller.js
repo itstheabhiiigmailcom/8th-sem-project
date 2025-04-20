@@ -1,17 +1,19 @@
 import Plant from '../models/plant.model.js';
 import { v4 as uuidv4 } from 'uuid';
+import { uploadToS3 } from '../middlewares/aws_s3.js'; // make sure this exists
+// Remove multer — we'll use busboy or multer depending on your preference
 
 export const createPlant = async (req, res) => {
   try {
-    const { family, scientificName, collector, country, uses, image } =
-      req.body;
+    const { family, scientificName, collector, country, uses } = req.body;
+    const file = req.file; // comes from multer or similar middleware
 
-    // Basic field validation
-    if (!family || !scientificName || !collector || !uses || !image) {
+    // Validate required fields
+    if (!family || !scientificName || !collector || !uses || !file) {
       return res.status(400).json({
         status: false,
         message:
-          'Missing required fields: family, scientificName, collector, uses, or image',
+          'Missing required fields: family, scientificName, collector, uses, or image file',
       });
     }
 
@@ -23,6 +25,15 @@ export const createPlant = async (req, res) => {
         message: 'Plant with this scientific name already exists.',
       });
     }
+
+    // Upload file to AWS S3
+    const uploadResult = await uploadToS3({
+      filePath: file.path,
+      fileName: file.originalname,
+      mimetype: file.mimetype,
+    });
+
+    const imageUrl = uploadResult.Location;
     const plant_id = uuidv4();
 
     const newPlant = new Plant({
@@ -30,9 +41,9 @@ export const createPlant = async (req, res) => {
       family,
       scientificName,
       collector,
-      country: country || '', // in case it's undefined
+      country: country || '',
       uses,
-      image,
+      image: imageUrl, // Use uploaded image URL
     });
 
     await newPlant.save();
@@ -43,7 +54,7 @@ export const createPlant = async (req, res) => {
       plant: newPlant,
     });
   } catch (error) {
-    console.error('Error saving plant:', error.message);
+    console.error('Error creating plant:', error.message);
     return res.status(500).json({
       status: false,
       message: 'Server error while saving plant',
@@ -80,6 +91,43 @@ export const getPlantById = async (req, res) => {
     return res.status(500).json({
       status: false,
       message: 'Server error while fetching plant',
+    });
+  }
+};
+
+export const uploadFile = async (req, res) => {
+  try {
+    const file = req.file;
+
+    if (!file) {
+      return res.status(400).json({ message: 'No file uploaded.' });
+    }
+
+    // Get the file path
+    const localFilePath = file.path;
+    if (!localFilePath) {
+      return res.status(409).json({
+        message: 'student Profile is required!',
+      });
+    }
+
+    // Upload file to AWS S3 using the local file path
+    const uploadResult = await uploadToS3({
+      filePath: localFilePath,
+      fileName: file.originalname, // Maintain the original file name
+      mimetype: file.mimetype, // Pass the MIME type for content-type headers
+    });
+
+    // Return success response
+    return res.status(200).json({
+      message: 'File uploaded successfully!',
+      fileUrl: uploadResult.Location, // S3 file URL
+    });
+  } catch (err) {
+    console.error('Error uploading file:', err.message);
+    return res.status(500).json({
+      message: 'Failed to upload file.',
+      error: err.message,
     });
   }
 };

@@ -49,6 +49,12 @@ const register = async (req, res) => {
       password,
     });
 
+    const accessToken = generateAccessToken(user._id);
+    const refreshToken = generateRefreshToken(user._id);
+
+    user.refreshToken = refreshToken;
+    await user.save();
+
     const createdUser = await User.findById(user._id).select(
       '-password -refreshToken'
     );
@@ -60,11 +66,27 @@ const register = async (req, res) => {
       });
     }
 
-    return res.status(201).json({
-      success: true,
-      message: 'User registered successfully!',
-      data: createdUser,
-    });
+    res
+      .status(201)
+      .cookie('accessToken', accessToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        maxAge: 15 * 60 * 1000,
+      })
+      .cookie('refreshToken', refreshToken, {
+        httpOnly: true,
+        secure: false,
+        sameSite: 'Lax',
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
+      .json({
+        success: true,
+        message: 'User registered and logged in successfully!',
+        data: createdUser,
+        accessToken,
+        refreshToken,
+      });
   } catch (error) {
     console.error('Registration Error:', error);
     return res.status(500).json({

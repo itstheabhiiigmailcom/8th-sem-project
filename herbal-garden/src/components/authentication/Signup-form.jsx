@@ -28,13 +28,14 @@ export default function SignupForm({ switchToLogin }) {
   } = useForm({ resolver: zodResolver(signupSchema) });
 
   const onSubmit = async (data) => {
-    await signup({
+    const result = await signup({
       fullName: data.name,
       email: data.email,
       password: data.password,
     });
-    if (!error) {
-      navigate('/welcome');
+
+    if (result.success) {
+      navigate('/home');
     }
   };
 

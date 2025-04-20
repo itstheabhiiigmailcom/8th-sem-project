@@ -43,12 +43,13 @@ export const AuthProvider = ({ children }) => {
     setAuthLoading(true);
     setError(null);
     try {
-      const { data } = await registerUser(data);
-      // console.log(user);
-      setUser(data);
+      const { data: userData } = await registerUser(data);
+      setUser(userData);
+      return { success: true };
     } catch (err) {
       setError(err.message);
       setUser(null);
+      return { success: false, message: err.message }; // ⬅️ return status
     } finally {
       setAuthLoading(false);
     }

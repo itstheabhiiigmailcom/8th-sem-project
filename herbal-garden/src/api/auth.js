@@ -18,8 +18,16 @@ export const registerUser = async ({ fullName, email, password }) => {
     credentials: 'include',
   });
 
-  if (!res.ok) throw new Error((await res.json()).message || 'Signup failed');
-  return res.json();
+  const data = await res.json();
+
+  if (!res.ok) {
+    // Include status code in the error object
+    const error = new Error(data.message || 'Signup failed');
+    error.status = res.status;
+    throw error;
+  }
+
+  return data;
 };
 
 // api/auth.js
